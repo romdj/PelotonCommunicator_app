@@ -3,46 +3,47 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:peloton_communicator/main.dart';
 
 void main() {
-  testWidgets('LongPressButton changes color on long press',
+  testWidgets('Long press on button changes its color',
       (WidgetTester tester) async {
-    // Build the LongPressButton widget.
-    await tester.pumpWidget(MaterialApp(home: LongPressButton()));
+    // Build the MaterialApp with the LongPressButton widget
+    await tester.pumpWidget(MyApp());
 
-    // Find the button widget.
-    final buttonFinder = find.byType(Container);
+    // Find the button by key
+    final buttonFinder = find.byKey(ValueKey('longPressButton'));
 
-    // Check the initial color of the button.
-    Container container = tester.firstWidget(buttonFinder);
-    expect(
-        container.decoration,
-        BoxDecoration(
-          color: Colors.blue,
-          borderRadius: BorderRadius.circular(12),
-        ));
-
-    // Trigger a long press on the button.
+    // Perform a long press on the button
     await tester.longPress(buttonFinder);
-    await tester.pump(const Duration(milliseconds: 1000));
 
-    // Check the color of the button after the long press.
-    container = tester.firstWidget(buttonFinder);
-    expect(
-        container.decoration,
-        BoxDecoration(
-          color: Colors.red,
-          borderRadius: BorderRadius.circular(12),
-        ));
+    // Wait for 300ms to exceed the duration of a long press
+    await tester.pump(Duration(milliseconds: 300));
 
-    // Release the long press.
-    await tester.pumpAndSettle();
+    // Verify that the button color changed to the active color
+    Color activeColor = Colors.red;
+    var button = tester.widget<RaisedButton>(buttonFinder);
+    expect(button.color, activeColor);
+  });
 
-    // Check the color of the button after the long press has ended.
-    container = tester.firstWidget(buttonFinder);
-    expect(
-        container.decoration,
-        BoxDecoration(
-          color: Colors.blue,
-          borderRadius: BorderRadius.circular(12),
-        ));
+  testWidgets(
+      'Releasing long press on button changes its color back to initial color',
+      (WidgetTester tester) async {
+    // Build the MaterialApp with the LongPressButton widget
+    await tester.pumpWidget(MyApp());
+
+    // Find the button by key
+    final buttonFinder = find.byKey(ValueKey('longPressButton'));
+
+    // Perform a long press on the button
+    await tester.longPress(buttonFinder);
+
+    // Wait for 300ms to exceed the duration of a long press
+    await tester.pump(Duration(milliseconds: 300));
+
+    // Release the long press
+    await tester.longPressEnd(buttonFinder);
+
+    // Verify that the button color changed back to the initial color
+    Color initialColor = Colors.grey;
+    var button = tester.widget<RaisedButton>(buttonFinder);
+    expect(button.color, initialColor);
   });
 }
