@@ -1,55 +1,64 @@
+import 'package:peloton_communicator/classes/audio_recording.dart';
+import 'package:peloton_communicator/classes/long_press_button.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+import 'classes/button_state.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ButtonState(),
+      child: MyApp(),
+    ),
+  );
+}
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: Text('Long Press Color Change'),
-        ),
+        appBar: AppBar(title: Text('Peloton Communicator')),
         body: Center(
-          child: LongPressButton(),
-        ),
-      ),
-    );
-  }
-}
-
-class LongPressButton extends StatefulWidget {
-  @override
-  _LongPressButtonState createState() => _LongPressButtonState();
-}
-
-class _LongPressButtonState extends State<LongPressButton> {
-  bool _isLongPressing = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onLongPress: () {
-        setState(() {
-          _isLongPressing = true;
-        });
-      },
-      onLongPressEnd: (details) {
-        setState(() {
-          _isLongPressing = false;
-        });
-      },
-      child: Container(
-        width: 150,
-        height: 150,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: _isLongPressing ? Colors.red : Colors.blue,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Text(
-          'Press and hold',
-          style: TextStyle(color: Colors.white, fontSize: 20),
+          child: Consumer<ButtonState>(
+            // child: Consumer<AudioRecording>(
+            // builder: (context, audioModel, child) => LongPressButton(audioModel: audioModel),
+            /* */
+            builder: (context, buttonState, child) {
+              return GestureDetector(
+                //   onLongPress: _startRecording,
+                //   onLongPressEnd: (details) => _stopRecording(),
+                //   child: RaisedButton(
+                //     key: ValueKey('longPressButton'),
+                //     color: _isRecording ? Colors.red : Colors.grey,
+                //     onPressed: () {},
+                //     child: Text('Long Press to Record'),
+                //   ),
+                // ),(
+                onLongPress: () {
+                  buttonState.setLongPressed(true);
+                },
+                onLongPressEnd: (details) {
+                  buttonState.setLongPressed(false);
+                },
+                child: Container(
+                  width: 100,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: buttonState.isLongPressed
+                        ? Colors.orange[900]
+                        : Colors.blue[900],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    buttonState.isLongPressed ? 'Speaking' : 'Listening',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
