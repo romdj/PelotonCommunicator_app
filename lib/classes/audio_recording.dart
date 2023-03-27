@@ -1,17 +1,21 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
+import 'package:peloton_communicator/classes/button_state.dart';
 
-class AudioRecording {
+class AudioRecording extends ChangeNotifier {
   FlutterSoundRecorder recorder = FlutterSoundRecorder();
-  bool isRecording = false;
+  ButtonState buttonState = ButtonState.idle;
 
   Future<void> startRecording() async {
     await recorder.startRecorder(toFile: 'audio_recording.aac');
-    isRecording = true;
+    buttonState = ButtonState.recording;
+    notifyListeners();
   }
 
   Future<void> stopRecording() async {
     await recorder.stopRecorder();
-    isRecording = false;
+    buttonState = ButtonState.idle;
+    notifyListeners();
   }
 
   Future<void> openRecorder() async {

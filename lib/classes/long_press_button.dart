@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:peloton_communicator/classes/audio_recording.dart';
+import 'package:peloton_communicator/classes/button_state.dart';
 
 class LongPressButton extends StatefulWidget {
   final AudioRecording audioModel;
@@ -19,9 +20,11 @@ class _LongPressButtonState extends State<LongPressButton> {
       child: Container(
         key: ValueKey('longPressButton'),
         alignment: Alignment.center,
-        color: widget.audioModel.isRecording ? Colors.red : Colors.green,
+        color: widget.audioModel.buttonState == ButtonState.recording
+            ? Colors.red
+            : Colors.green,
         child: Text(
-          widget.audioModel.isRecording
+          widget.audioModel.buttonState == ButtonState.recording
               ? 'Recording...'
               : 'Long Press to Record',
           style: TextStyle(fontSize: 24, color: Colors.white),
