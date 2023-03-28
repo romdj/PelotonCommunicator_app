@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:peloton_communicator/permissions/microphone_permission_handler.dart';
 import 'package:peloton_communicator/classes/audio_recording.dart';
 import 'package:peloton_communicator/classes/long_press_button.dart';

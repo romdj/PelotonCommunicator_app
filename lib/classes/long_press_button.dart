@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:peloton_communicator/classes/audio_recording.dart';
 import 'package:peloton_communicator/classes/button_state.dart';
 import 'package:peloton_communicator/permissions/microphone_permission_handler.dart';
-import 'package:peloton_communicator/permissions/permission_handler.dart';
-
-import '../permissions/microphone_permission_handler.dart';
 
 class LongPressButton extends StatefulWidget {
   final AudioRecording audioModel;

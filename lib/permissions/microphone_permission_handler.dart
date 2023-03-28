@@ -1,8 +1,7 @@
 import 'dart:io';
+
 import 'package:permission_handler/permission_handler.dart';
-
 import 'package:peloton_communicator/permissions/permission_model.dart';
-
 import 'permission_handler.dart';
 
 class MicrophonePermissionHandler extends PermissionHandler {
