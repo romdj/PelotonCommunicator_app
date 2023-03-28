@@ -7,6 +7,7 @@ class AudioRecording extends ChangeNotifier {
   ButtonState buttonState = ButtonState.idle;
 
   Future<void> startRecording() async {
+    await openRecorder();
     await recorder.startRecorder(toFile: 'audio_recording.aac');
     buttonState = ButtonState.recording;
     notifyListeners();
@@ -16,6 +17,7 @@ class AudioRecording extends ChangeNotifier {
     await recorder.stopRecorder();
     buttonState = ButtonState.idle;
     notifyListeners();
+    closeRecorder();
   }
 
   Future<void> openRecorder() async {

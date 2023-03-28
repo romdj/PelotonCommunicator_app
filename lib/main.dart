@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:peloton_communicator/classes/application_permission_schema.dart';
 import 'package:peloton_communicator/classes/audio_recording.dart';
 import 'package:peloton_communicator/classes/long_press_button.dart';
 import 'package:provider/provider.dart';
@@ -11,7 +14,7 @@ void main() {
       child: PelotonCommunicator(),
     ),
   );
-  requestPermissions();
+  if (Platform.isAndroid) requestAndroidPermissions();
 }
 
 class PelotonCommunicator extends StatelessWidget {
@@ -31,11 +34,24 @@ class PelotonCommunicator extends StatelessWidget {
   }
 }
 
-Future<void> requestPermissions() async {
+Future<void> requestAndroidPermissions() async {
   await Permission.microphone.request();
+
   if (await Permission.microphone.isGranted) {
+    ApplicationPermissionSchema().permissionModels.add(
+          PermissionModel(
+            operatingSystem: Platform.operatingSystem,
+            permissionType: PermissionType.microphone,
+            hasPermission: true,
+          ),
+        );
     print('Microphone permission granted.');
   } else {
+    ApplicationPermissionSchema().permissionModels.add(PermissionModel(
+          operatingSystem: Platform.operatingSystem,
+          permissionType: PermissionType.microphone,
+          hasPermission: true,
+        ));
     print('Microphone permission not granted.');
   }
 }
