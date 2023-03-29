@@ -19,11 +19,14 @@ class _LongPressButtonState extends State<LongPressButton> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      // onForcePressStart: widget.audioModel.startRecording,
       onLongPress: widget.audioModel.startRecording,
-      onLongPressEnd: (details) => widget.audioModel.stopRecording(),
+      onLongPressEnd: (details) => widget.audioModel.stopRecordingAndPlayIt(),
+      // onLongPressEnd: (details) => {
+      //   widget.audioModel.stopRecordingAndPlayIt();
+      //   widget.audioModel.closeRecorder();
+      //   },
       child: Container(
-          key: ValueKey('longPressButton'),
+          key: const ValueKey('longPressButton'),
           alignment: Alignment.center,
           color: getColor(),
           child: getText()),
@@ -45,14 +48,14 @@ class _LongPressButtonState extends State<LongPressButton> {
   getText() {
     if (microphonePermissionHandler.hasPermission()) {
       if (widget.audioModel.buttonState == ButtonState.recording) {
-        return Text('Recording...',
+        return const Text('Recording...',
             style: TextStyle(fontSize: 24, color: Colors.white));
       } else {
-        return Text('Long Press to Record...',
+        return const Text('Long Press to Record...',
             style: TextStyle(fontSize: 24, color: Colors.white));
       }
     } else {
-      Text('Communication Functionnality blocked - Access not granted',
+      const Text('Communication Functionnality blocked - Access not granted',
           style: TextStyle(fontSize: 24, color: Colors.white));
     }
   }

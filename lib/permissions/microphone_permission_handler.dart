@@ -19,16 +19,18 @@ class MicrophonePermissionHandler extends PermissionHandler {
 
   @override
   void addPermission(String operatingSystem) {
-    this.microphonePermissions.add(PermissionModel(
-          operatingSystem: operatingSystem,
-          hasPermission: true,
-        ));
+    microphonePermissions.add(PermissionModel(
+      operatingSystem: operatingSystem,
+      hasPermission: true,
+    ));
   }
 
   @override
   bool hasPermission() {
     // if(this.microphonePermissions.where((element) => element.operatingSystem == Platform.operatingSystem).isNotEmpty
     if (Platform.isIOS) return true;
+
+    // TODO complete implementation for Android
     if (Platform.isAndroid) return true;
     throw UnimplementedError();
   }
