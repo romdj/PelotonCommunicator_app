@@ -3,6 +3,8 @@
     "cupertino"
   ],
   "cSpell.words": [
+    "dotenv",
+    "mqtt",
     "peloton"
   ]
 }
