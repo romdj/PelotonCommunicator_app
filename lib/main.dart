@@ -1,34 +1,43 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-
-import 'package:peloton_communicator/permissions/microphone_permission_handler.dart';
 import 'package:peloton_communicator/classes/audio_recording.dart';
 import 'package:peloton_communicator/classes/long_press_button.dart';
-import 'package:provider/provider.dart';
+import 'package:peloton_communicator/permissions/microphone_permission_handler.dart';
 
 var packageInfo;
-void main() async {
+
+Future<void> main() async {
   WidgetsFlutterBinding
       .ensureInitialized(); // Ensures that Flutter is properly initialized before running any asynchronous code
   MicrophonePermissionHandler microphonePermissionHandler =
       MicrophonePermissionHandler();
 
-  print('packageInfo: $packageInfo');
-
   await microphonePermissionHandler.requestPermission();
 
+  packageInfo = await PackageInfo.fromPlatform();
+  await dotenv.load(fileName: '.env');
+
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => AudioRecording(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) {
+            AudioRecording audioRecording = AudioRecording();
+            audioRecording
+                .init(); // Call the init method after instantiating AudioRecording
+            return audioRecording;
+          },
+        ),
+      ],
       child: PelotonCommunicator(),
     ),
   );
-  packageInfo = await PackageInfo.fromPlatform();
 }
 
 class PelotonCommunicator extends StatelessWidget {
+  const PelotonCommunicator({super.key});
   @override
   Widget build(BuildContext context) {
     String appHeaderTitle =

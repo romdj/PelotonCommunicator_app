@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:peloton_communicator/classes/audio_recording.dart';
 import 'package:peloton_communicator/classes/button_state.dart';
@@ -20,11 +22,11 @@ class _LongPressButtonState extends State<LongPressButton> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onLongPress: widget.audioModel.startRecording,
-      onLongPressEnd: (details) => widget.audioModel.stopRecordingAndPlayIt(),
-      // onLongPressEnd: (details) => {
-      //   widget.audioModel.stopRecordingAndPlayIt();
-      //   widget.audioModel.closeRecorder();
-      //   },
+      onLongPressEnd: (details) {
+        widget.audioModel.stopRecording();
+        widget.audioModel.startPlaying();
+        // widget.audioModel.publishAudioFile();
+      },
       child: Container(
           key: const ValueKey('longPressButton'),
           alignment: Alignment.center,
@@ -38,7 +40,7 @@ class _LongPressButtonState extends State<LongPressButton> {
       if (widget.audioModel.buttonState == ButtonState.recording) {
         return Colors.orange[900];
       } else {
-        return Colors.green;
+        return Colors.green[900];
       }
     } else {
       return Colors.red[900];
@@ -51,11 +53,11 @@ class _LongPressButtonState extends State<LongPressButton> {
         return const Text('Recording...',
             style: TextStyle(fontSize: 24, color: Colors.white));
       } else {
-        return const Text('Long Press to Record...',
+        return const Text('Long Press to Record...test1',
             style: TextStyle(fontSize: 24, color: Colors.white));
       }
     } else {
-      const Text('Communication Functionnality blocked - Access not granted',
+      const Text('Communication Functionality blocked - Access not granted',
           style: TextStyle(fontSize: 24, color: Colors.white));
     }
   }
