@@ -1,9 +1,13 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:convert';
+
+import 'package:flutter/services.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:logger/logger.dart';
+import 'package:peloton_communicator/classes/device_information.dart';
 import 'package:typed_data/typed_buffers.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -14,8 +18,6 @@ class MqttManager {
 
   Future<void> connectToAwsIotCore() async {
     String awsIotEndpoint = dotenv.env['AWS_IOT_ENDPOINT']!;
-    String certificatePath = dotenv.env['CERTIFICATE_PATH']!;
-    String privateKeyFileName = dotenv.env['PRIVATE_KEY']!;
 
     const int awsIotPort = 8883;
 
@@ -34,6 +36,8 @@ class MqttManager {
     final connMessage =
         MqttConnectMessage().withClientIdentifier(identifier).startClean();
     client.connectionMessage = connMessage;
+
+    publishNotificationToTopic("device ${getAppDeviceId()} connected");
 
     try {
       final securityContext = await loadSecurityContext();
@@ -57,18 +61,24 @@ class MqttManager {
   }
 
   void _onConnected() {
+    publishNotificationToTopic("device ${getAppDeviceId()} connected");
     logger.i('Connected');
   }
 
   void _onDisconnected() {
+    publishNotificationToTopic("device ${getAppDeviceId()} disconnected");
     logger.i('Disconnected');
   }
 
   void _onSubscribed(String topic) {
+    publishNotificationToTopic(
+        "device ${getAppDeviceId()} subscribed to $topic");
     logger.i('Subscribed topic: $topic');
   }
 
   void _onSubscribeFail(String topic) {
+    publishNotificationToTopic(
+        "device ${getAppDeviceId()} failed to subscribe to $topic");
     logger.i('Failed to subscribe $topic');
   }
 
@@ -114,7 +124,8 @@ class MqttManager {
       String text /* , String topic */) async {
     const topic = 'test_topic/peloton_communicator/notification';
     final message = MqttClientPayloadBuilder();
-    message.addString(text);
+
+    message.addString('{"message":"$text"}');
     int returnValue =
         client.publishMessage(topic, MqttQos.atLeastOnce, message.payload!);
     logger.i('Published message ($text) with return value $returnValue');
@@ -128,83 +139,19 @@ class MqttManager {
 
     final certificatePath = dotenv.env['CERTIFICATE_PATH']!;
     final privateKeyFileName = dotenv.env['PRIVATE_KEY']!;
+    SecurityContext securityContext = SecurityContext.defaultContext;
 
-    final securityContext = SecurityContext.defaultContext;
-
-    final certificateFile = File('$path/$certificatePath');
-    logger.d(
-        '$path/$certificatePath certificateFile: ${certificateFile.existsSync()}');
-    final certificateFile2 = File(certificatePath);
-    logger.d(
-        '$certificatePath certificateFile2: ${certificateFile2.existsSync()}');
-    final certificateFile3 = File('$path/Documents/$certificatePath');
-    logger.d(
-        '$path/Documents/$certificatePath certificateFile3: ${certificateFile3.existsSync()}');
-    final certificateFile4 = File('Documents/$certificatePath');
-    logger.d(
-        'Documents/$certificatePath certificateFile4: ${certificateFile4.existsSync()}');
-    final certificateFile5 =
-        File('$path/flutter_assets/certificates/$certificatePath');
-    logger.d(
-        '$path/flutter_assets/certificates/$certificatePath certificateFile5: ${certificateFile5.existsSync()}');
-    final certificateFile6 =
-        File('flutter_assets/certificates/$certificatePath');
-    logger.d(
-        'flutter_assets/certificates/$certificatePath certificateFile6: ${certificateFile6.existsSync()}');
-    final certificateFile7 =
-        File('/flutter_assets/certificates/$certificatePath');
-    logger.d(
-        '/flutter_assets/certificates/$certificatePath certificateFile7: ${certificateFile7.existsSync()}');
-    final certificateFile8 =
-        File('flutter_assets/assets/certificates/$certificatePath');
-    logger.d(
-        'flutter_assets/certificates/$certificatePath certificateFile8: ${certificateFile8.existsSync()}');
-    final certificateFile9 =
-        File('/flutter_assets/assets/certificates/$certificatePath');
-    logger.d(
-        '/flutter_assets/assets/certificates/$certificatePath certificateFile9: ${certificateFile9.existsSync()}');
-    final certificateFile10 =
-        File('$path/flutter_assets/assets/certificates/$certificatePath');
-    logger.d(
-        '$path/flutter_assets/assets/certificates/$certificatePath certificateFile10: ${certificateFile10.existsSync()}');
-
-    if (certificateFile.existsSync()) {
-      securityContext.setTrustedCertificates('$path/$certificatePath');
-    } else {
-      throw Exception('Certificate file not found');
+    try {
+      final certificateContent =
+          await rootBundle.loadString('assets/certificates/$certificatePath');
+      final privateKeyContent = await rootBundle
+          .loadString('assets/certificates/$privateKeyFileName');
+      securityContext
+          .setTrustedCertificatesBytes(utf8.encode(certificateContent));
+      securityContext.usePrivateKeyBytes(utf8.encode(privateKeyContent));
+    } catch (e) {
+      throw Exception('Certificate could not be loaded. Reason: $e');
     }
-
-    final privateKeyFile = File('$path/$privateKeyFileName');
-    if (privateKeyFile.existsSync()) {
-      securityContext.usePrivateKey('$path/$privateKeyFileName');
-      // securityContext.usePrivateKey('$path/$privateKeyFileName');
-    } else {
-      throw Exception('Private key file not found');
-    }
-
     return securityContext;
   }
-/* 
-  Future<String> loadSecurityContextFile(String envVariable, String certificatePath) async {
-    // final appDocumentsDirectory = await getApplicationDocumentsDirectory();
-    // final path = appDocumentsDirectory.path;
-
-    final certificatePath = dotenv.env[envVariable]!;
-
-    final certificateFile = File(certificatePath);
-    if (certificateFile.existsSync()) {
-      securityContext.setTrustedCertificates('$path/$certificatePath');
-    } else {
-      throw Exception('Certificate file not found');
-    }
-
-    final privateKeyFile = File('$path/$privateKeyFileName');
-    if (privateKeyFile.existsSync()) {
-      securityContext.usePrivateKey('$path/$privateKeyFileName');
-    } else {
-      throw Exception('Private key file not found');
-    }
-
-    return securityContext;
-  } */
 }

@@ -53,7 +53,7 @@ class _LongPressButtonState extends State<LongPressButton> {
         return const Text('Recording...',
             style: TextStyle(fontSize: 24, color: Colors.white));
       } else {
-        return const Text('Long Press to Record...test1',
+        return const Text('Long Press to Record...test12',
             style: TextStyle(fontSize: 24, color: Colors.white));
       }
     } else {

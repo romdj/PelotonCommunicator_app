@@ -1,0 +1,15 @@
+{
+  "project_version": "0.0.1+2",
+  "latency": {
+    "talkie-walkie": {
+      "min": 50.000000,
+      "max": 250.000000,
+      "avg": 100.000000
+    },
+    "pelotonCommunicator": {
+      "min": 50.000000,
+      "max": 500.000000,
+      "avg": 100.000000
+    }
+  }
+}
